@@ -1,57 +1,52 @@
-int R = 9; //Red Leds
-int G = 10; //Green LEDs
-int B = 11; //Blue LEDs
-int Rpot = A0;
-int Gpot = A1;
-int Bpot = A2;
-int button = 7;  //Switch
-int setting = 0;  //LED Mode
-int x[2]= {
+/*
+BarLights!
+ C.Font 27 October 2014
+ Using a momentary button, an LED strip and 3 potentiometers to 
+ make the LEDs enter one of 9 settings
+ Feel free to use/modify this code for all your project needs!
+ */
+
+int R = 9; //Red Pin
+int G = 10; //Green Pin
+int B = 11; //Blue Pin
+int Rpot = A0;  // Potentiometer pin for Red
+int Gpot = A1;  // Potentiometer pin for Green
+int Bpot = A2;  // Potentiometer pin for Blue
+int button = 7;  // Switch Pin
+int setting = 0;  // LED setting
+int x[2]= {     // To Check if button went from HIGH to LOW
   1,1};
 int RGB[3] = {
   0,0,0};
-int RGBpot[3] = {
-  A0,A1,A2};
-int Rclr = 0;
-int Gclr = 0;
-int Bclr = 0;
-int Rclr2 = 0;
-int Gclr2 = 0;
-int Bclr2 = 0;
-int Rchange = 5;
-int Gchange = 5;
-int Bchange = 5;
-int timedelay = 100;
+int Rclr = 0;     // Default Red amount for fade setting
+int Gclr = 0;     // Default Green amount for fade setting
+int Bclr = 0;     // Default Blue amount for fade setting
+int Rchange = 5;    // Amount the Red LED will change each iteration in fade setting
+int Gchange = 5;    // Amount the Green LED will change each iteration in fade setting
+int Bchange = 5;    // Amount the Blue LED will change each iteration in fade setting
+int timedelay = 100;  // milliseconds between each color change in fade
 int flag = 0;
-
-
-
-
 
 void setup(){
   pinMode(R,OUTPUT);
   pinMode(G,OUTPUT);
   pinMode(B,OUTPUT);
   pinMode(button,INPUT_PULLUP);
-  // Serial.begin(9600);
 }
 
 
 void loop(){
-  x[1] = digitalRead(button);
+  x[1] = digitalRead(button);   // Checks current button state
   if(x[1] == 0 && x[0] == 1){
     setting = setting++;
   }
 
-  if (setting >= 10){
+  if (setting >= 10){ // Restarts the setting cycle after last one
     setting = 0;
   }
 
-
-
-
-  switch(setting){
-  case 0: //White
+  switch(setting){  // Checks the variable setting and performs the case that matches it
+  case 0: // White 
     analogWrite(R,255);
     analogWrite(G,255);
     analogWrite(B,255);
@@ -88,7 +83,7 @@ void loop(){
     break;
   case 7:  // Fade
     while(flag == 0){
-      delay(500);
+      delay(500); // Without this delay case 7 would get skipped from previous button press
       Initialize();
       TurnOnBlue();
       TurnOnGreen();
@@ -119,7 +114,7 @@ void loop(){
     flag = 0;
     break;
 
-  case 8:  //  Christmas Setting
+  case 8:  //  Christmas Setting: Red & Green alternate ON/OFF every 1/2 second
     while(digitalRead(button) == HIGH){
       if(digitalRead(button) == LOW){
         setting++;
@@ -132,7 +127,7 @@ void loop(){
       delay(500);
       digitalWrite(G,LOW);
     }
-  case 9:
+  case 9: // Custom color setting using potentiometers
     while(digitalRead(button) == HIGH){
       if(digitalRead(button) == LOW){
         setting++;
@@ -146,23 +141,13 @@ void loop(){
       analogWrite(B, RGB[3]);
     }
 
-
   }
-  x[0] = x[1];
+  x[0] = x[1];  // stores previous button state
 }
 
 //  Functions
 
-void PressedButton(){
-  x[1] = digitalRead(button);
-  if(x[1] == 0 && x[0] == 1){
-    flag = 1;
-  }
-  x[0] = x[1];
-
-}
-
-void Initialize(){
+void Initialize(){  // Starts with all LEDs off
   Rclr = 0;
   Gclr = 0;
   Bclr = 0; 
@@ -171,7 +156,7 @@ void Initialize(){
   analogWrite(B, 0);
 }
 
-void TurnOnBlue(){
+void TurnOnBlue(){  // Turn on Blue as long as button hasn't been pressed
   if (flag == 1){
     Bclr = 251;
   }    
@@ -189,7 +174,7 @@ void TurnOnBlue(){
 }
 
 
-void TurnOffBlue(){
+void TurnOffBlue(){ // Turn off Blue as long as button hasn't been pressed
   if (flag == 1){
     Bclr = 4;
   }
@@ -205,7 +190,7 @@ void TurnOffBlue(){
   }
 }
 
-void TurnOnRed(){
+void TurnOnRed(){ // Turn on Red as long as button hasn't been pressed
   if (flag == 1){
     Rclr = 251;
   }
@@ -221,7 +206,7 @@ void TurnOnRed(){
   }
 }
 
-void TurnOffRed(){
+void TurnOffRed(){  // Turn off Red as long as button hasn't been pressed
   if (flag == 1){
     Rclr = 4;
   }
@@ -237,7 +222,7 @@ void TurnOffRed(){
   }
 }
 
-void TurnOnGreen(){
+void TurnOnGreen(){ // Turn on Green as long as button hasn't been pressed
   if (flag == 1){
     Gclr = 251;
   }
@@ -253,7 +238,7 @@ void TurnOnGreen(){
   }
 }
 
-void TurnOffGreen(){
+void TurnOffGreen(){  // Turn off Green as long as button hasn't been pressed
   if (flag == 1){
     Gclr = 4;
   }
@@ -269,7 +254,7 @@ void TurnOffGreen(){
   }
 }
 
-void TurnOffAll(){
+void TurnOffAll(){  // Turn off all as long as button hasn't been pressed
   if (flag == 1){
     Bclr = 4;
   }
@@ -279,7 +264,7 @@ void TurnOffAll(){
       //setting++;
       break;
     }
-    Rclr = Rclr - Rchange;
+    Rclr = Rclr - Rchange;  
     Gclr = Gclr - Gchange;
     Bclr = Bclr - Bchange;
     analogWrite(R, Rclr);
@@ -288,3 +273,4 @@ void TurnOffAll(){
     delay(timedelay);
   }
 }
+
